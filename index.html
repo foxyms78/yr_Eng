@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1b2540">
+<title>영어 자습 노트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Literata:opsz,wght@7..72,500;7..72,700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 첫 화면: 세트 선택 -->
+  <section id="home" class="home">
+    <header>
+      <h1><span>영어 자습 노트</span></h1>
+      <p>오늘은 무엇을 준비할까요?</p>
+    </header>
+    <button class="pick" id="pick-final" data-set="final">
+      <span class="pick-tag">내신</span>
+      <b>2학기 기말 대비</b>
+      <small id="finalInfo">교과서·부교재 범위 단어</small>
+    </button>
+    <button class="pick" id="pick-suneung" data-set="suneung">
+      <span class="pick-tag">수능</span>
+      <b>수능 필수 단어</b>
+      <small id="suneungInfo">목표: 영어 3등급 (70점)</small>
+    </button>
+    <p class="sync" id="syncHome"></p>
+  </section>
+
+  <!-- 세트 화면 -->
+  <section id="app" hidden>
+    <header class="app-head">
+      <button class="back" id="backHome" aria-label="처음 화면으로">‹ 처음</button>
+      <h1><span id="setTitle"></span></h1>
+      <p id="setSub"></p>
+    </header>
+
+    <div id="banner" class="banner" hidden></div>
+
+    <nav class="tabs" role="tablist">
+      <button role="tab" id="tab-today" aria-selected="true" data-view="today">오늘</button>
+      <button role="tab" id="tab-words" aria-selected="false" data-view="words">단어</button>
+      <button role="tab" id="tab-week" aria-selected="false" data-view="week">이번 주</button>
+    </nav>
+
+    <!-- 오늘 -->
+    <section id="view-today" class="card">
+      <div class="row between">
+        <h2 id="todayTitle">오늘 할 일</h2>
+        <input type="date" id="logDate" class="date">
+      </div>
+      <label class="check" id="c-word"><input type="checkbox" id="chk-word"><span><b>단어 15~20분</b><small>단어 탭에서 퀴즈를 끝내면 자동으로 체크돼요</small></span></label>
+      <label class="check" id="c-syntax"><input type="checkbox" id="chk-syntax"><span><b>구문·해석 10분</b><small id="syntaxHint">긴 문장 2~3개 끊어 읽기</small></span></label>
+      <label class="check" id="c-problem"><input type="checkbox" id="chk-problem"><span><b>문제 10분</b><small id="problemHint">쉬운 유형(대의 파악·도표·내용 일치) 2~3문제</small></span></label>
+      <div id="todayQuiz" class="status"></div>
+      <label class="eyebrow" for="memo">한 줄 메모 · 어려웠던 점, 틀린 이유</label>
+      <textarea id="memo" placeholder="예) 빈칸 문제 2개 중 1개 틀림. 'despite' 뒤 구조를 헷갈렸다."></textarea>
+      <div class="row"><button class="btn" id="saveMemo">메모 저장</button><span class="status" id="saveStatus"></span></div>
+    </section>
+
+    <!-- 단어 -->
+    <section id="view-words" class="card" hidden>
+      <div id="wordsHome" class="stack">
+        <h2 id="wordsTitle"></h2>
+        <div id="wordsEmpty" class="empty-box" hidden></div>
+        <div id="wordsBody" class="stack">
+          <span class="eyebrow" id="dayLabel">DAY 선택</span>
+          <div class="days" id="dayPick"></div>
+          <div class="seg" role="group" aria-label="문제 방향">
+            <button id="dir-ek" aria-pressed="true">영어 → 뜻</button>
+            <button id="dir-ke" aria-pressed="false">뜻 → 영어</button>
+          </div>
+          <div class="row">
+            <button class="btn" id="startQuiz">퀴즈 시작</button>
+            <button class="btn ghost" id="showList">단어 외우기</button>
+            <button class="btn ghost" id="startReview">오답 복습</button>
+          </div>
+          <p class="legend" id="reviewInfo"></p>
+          <div id="listBox" hidden>
+            <div class="row between"><span class="eyebrow" id="listTitle"></span><button class="btn ghost small" id="toggleHide">뜻 가리기</button></div>
+            <div class="wordlist" id="wordList"></div>
+          </div>
+        </div>
+      </div>
+      <div id="quizBox" class="stack" hidden>
+        <div class="q-meta"><span id="qLabel"></span><span id="qCount"></span></div>
+        <div class="bar"><i id="qBar"></i></div>
+        <div class="q-word" id="qWord"></div>
+        <div class="opts" id="qOpts"></div>
+        <button class="btn ghost" id="quitQuiz">그만하기</button>
+      </div>
+      <div id="resultBox" class="stack" hidden>
+        <span class="eyebrow" id="rLabel"></span>
+        <div class="score" id="rScore"></div>
+        <p class="status center" id="rSaved"></p>
+        <div id="rWrongWrap"><span class="eyebrow">틀린 단어</span><div class="wrongs" id="rWrongs"></div></div>
+        <div class="row"><button class="btn" id="retry">틀린 것만 다시</button><button class="btn ghost" id="backWords">처음으로</button></div>
+      </div>
+    </section>
+
+    <!-- 이번 주 -->
+    <section id="view-week" class="stack" hidden>
+      <div class="card">
+        <div class="row between">
+          <h2 id="weekTitle">이번 주</h2>
+          <div class="row tight"><button class="btn ghost small" id="prevWeek" aria-label="지난주">‹</button><button class="btn ghost small" id="nextWeek" aria-label="다음 주">›</button></div>
+        </div>
+        <div class="week" id="weekGrid"></div>
+        <p class="legend">점 3개 = 단어 · 구문 · 문제 / 아래 숫자 = 이 세트의 단어 퀴즈 점수</p>
+        <div class="stats">
+          <div class="stat"><b id="sDays">0일</b><span>공부한 날</span></div>
+          <div class="stat"><b id="sAvg">–</b><span>퀴즈 평균</span></div>
+          <div class="stat"><b id="sStreak">0일</b><span>연속 일수</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>이번 주 메모</h2>
+        <div class="memos" id="weekMemos"></div>
+      </div>
+      <div class="card">
+        <h2>엄마 한마디</h2>
+        <textarea id="momNote" placeholder="이번 주 잘한 점, 다음 주 조정할 점을 한두 줄로 남겨 주세요."></textarea>
+        <div class="row"><button class="btn" id="saveMom">저장</button><span class="status" id="momStatus"></span></div>
+      </div>
+    </section>
+
+    <p class="sync" id="syncApp"></p>
+  </section>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/data-final.js"></script>
+<script src="js/data-suneung.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
